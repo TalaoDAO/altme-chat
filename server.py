@@ -33,18 +33,18 @@ red= redis.Redis(host='127.0.0.1', port=6379, db=0)
 
 
 def init_app(app,red) :
-    app.add_url_rule('/nonce',  view_func=get_nonce, methods = ['GET'], defaults={'red' : red})
-    app.add_url_rule('/register' , view_func=validate_sign,methods=['POST'], defaults={'red' : red})
+    app.add_url_rule('/nonce',  view_func=nonce, methods = ['GET'], defaults={'red' : red})
+    app.add_url_rule('/register' , view_func=register,methods=['POST'], defaults={'red' : red})
     return
 
 
-def get_nonce(red):
-    logging.info("get_nonce")
-    """try:
+def nonce(red):
+    logging.info("/nonce")
+    try:
         if request.headers['X-API-KEY']!=API_KEY:
             return jsonify('Unauthorized'), 403
     except KeyError:
-        return jsonify('Unauthorized'), 403"""
+        return jsonify('Unauthorized'), 403
 
     nonce = str(uuid.uuid1())
     red.setex(request.headers['did'], 180, json.dumps({"nonce" : nonce})) 
@@ -55,13 +55,17 @@ def get_nonce(red):
 
 
 
-async def validate_sign(red):
-    logging.info("validate_sign")
-    username=request.form["username"]
-    nonce=json.loads(red.get(username).decode())['nonce']
-    didAuth = request.form["didAuth"]    
-    password=request.form["password"]
-    result = json.loads(await didkit.verify_presentation(didAuth, nonce))
+async def register(red):
+    logging.info("/register")
+    try:
+        username=request.form["username"]
+        nonce=json.loads(red.get(username).decode())['nonce']
+        didAuth = request.form["didAuth"]    
+        password=request.form["password"]
+        result = json.loads(await didkit.verify_presentation(didAuth, json.dumps({"challenge":nonce})))
+    except KeyError:
+        logging.error("KeyError")
+        return jsonify("KeyError"),403
     if(not result["errors"]):
         stream = os.popen("""
         cd /etc/matrix-synapse/
