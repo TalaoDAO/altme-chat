@@ -142,12 +142,12 @@ class TestAuthMethods:
 
     @pytest.mark.asyncio
     async def test_issue_and_verify_didauth_verifiable_presentation(self):
-        presentation = await didkit.did_auth(self.did, json.dumps({"challenge":"nonce"}), JWK)
+        presentation = await didkit.did_auth(self.did, json.dumps({"challenge":"8b726b2a-a6fe-11ed-baee-b189f97ef426"}), JWK)
+        print(type(presentation))
         print(presentation)
-        print(self.options)
-        print(self.did)
+        presentation="""{"@context":["https://www.w3.org/2018/credentials/v1"],"type":"VerifiablePresentation","proof":{"type":"Ed25519Signature2018","proofPurpose":"authentication","challenge":"8b726b2a-a6fe-11ed-baee-b189f97ef426","verificationMethod":"did:key:z6MkiVpwA241guqtKWAkohHpcAry7S94QQb6ukW3GcCsugbK#z6MkiVpwA241guqtKWAkohHpcAry7S94QQb6ukW3GcCsugbK","created":"2023-02-07T15:46:32.288Z","jws":"eyJhbGciOiJFZERTQSIsImNyaXQiOlsiYjY0Il0sImI2NCI6ZmFsc2V9..lMUv5q6IM36ADVdUlDSMztamC-tJOd9A44i3r6PH5VTM2J8cwU77bh0kNRifNLGCMzORFRggDsHbsbsCIaMBBw"},"holder":"did:key:z6MkiVpwA241guqtKWAkohHpcAry7S94QQb6ukW3GcCsugbK"}"""
         result = json.loads(
-            await didkit.verify_presentation(presentation, json.dumps({"challenge":"nonce"}))
+            await didkit.verify_presentation(presentation, json.dumps({"challenge":"8b726b2a-a6fe-11ed-baee-b189f97ef426"}))
         )
         print(result)
 

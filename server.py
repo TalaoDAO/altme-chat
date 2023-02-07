@@ -29,12 +29,9 @@ mode = environment.currentMode(myenv)
 red= redis.Redis(host='127.0.0.1', port=6379, db=0)
 
 
-
-
-
 def init_app(app,red) :
-    app.add_url_rule('/nonce',  view_func=nonce, methods = ['GET'], defaults={'red' : red})
-    app.add_url_rule('/register' , view_func=register,methods=['POST'], defaults={'red' : red})
+    app.add_url_rule('/matrix/nonce',  view_func=nonce, methods = ['GET'], defaults={'red' : red})
+    app.add_url_rule('/matrix/register' , view_func=register,methods=['POST'], defaults={'red' : red})
     return
 
 
@@ -47,12 +44,8 @@ def nonce(red):
         return jsonify('Unauthorized'), 403
 
     nonce = str(uuid.uuid1())
-    red.setex(request.headers['did'], 180, json.dumps({"nonce" : nonce})) 
+    red.setex(request.args.get('did'), 180, json.dumps({"nonce" : nonce})) 
     return jsonify({nonce:nonce}) 
-
-
-    
-
 
 
 async def register(red):
@@ -60,12 +53,14 @@ async def register(red):
     try:
         username=request.form["username"]
         nonce=json.loads(red.get(username).decode())['nonce']
-        didAuth = request.form["didAuth"]    
+        didAuth =request.form["didAuth"]
         password=request.form["password"]
-        result = json.loads(await didkit.verify_presentation(didAuth, json.dumps({"challenge":nonce})))
-    except KeyError:
-        logging.error("KeyError")
-        return jsonify("KeyError"),403
+        result = json.loads(
+            await didkit.verify_presentation(didAuth, json.dumps({"challenge":nonce}))
+        )
+    except (KeyError, AttributeError,ValueError)as error:
+        logging.error(error)
+        return jsonify(str(error.__class__)),403
     if(not result["errors"]):
         stream = os.popen("""
         cd /etc/matrix-synapse/
@@ -75,17 +70,9 @@ async def register(red):
     else:
         return jsonify(result["errors"]), 403
 
-    
-
 
 if __name__ == '__main__':
     logging.info("app init")
-    
     init_app(app,red)
-
-    
-
-
     app.run( host = "localhost", port= mode.port, debug =True)
-""",ssl_context='adhoc'"""
 
