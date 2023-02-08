@@ -73,6 +73,7 @@ async def register(red):
 
 if __name__ == '__main__':
     logging.info("app init")
-    init_app(app,red)
     app.run( host = mode.IP, port= mode.port, debug =True)
+init_app(app,red)
+
 
