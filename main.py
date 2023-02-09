@@ -1,28 +1,25 @@
-
-from flask import Flask,render_template, request, jsonify, redirect,session, Response,send_file
+from flask import Flask,request, jsonify
 import uuid 
 import json
 import redis
 import string
-import random
 import os
 import environment
-from datetime import datetime, timedelta
 import didkit
 import logging
 logging.basicConfig(level=logging.INFO)
 
+with open('keys.json') as mon_fichier:
+    data = json.load(mon_fichier)
 
 app = Flask(__name__)
-app.secret_key ="SECRET_KEY"
-API_KEY="API_KEY"
+app.secret_key = data.get('secret_key')
+API_KEY= data.get('API_KEY')
 
 characters = string.digits
 
 #init environnement variable
 myenv = os.getenv('MYENV')
-if not myenv :
-   myenv='thierry'
 
 mode = environment.currentMode(myenv)
 
@@ -58,12 +55,17 @@ async def register(red):
         didAuth =request.get_json()["didAuth"]
         logging.info(didAuth)
         password=request.get_json()["password"]
-        #result = json.loads(
-            #await didkit.verify_presentation(didAuth, json.dumps({"challenge":nonce}))
-        #)
+        result = json.loads(
+            await didkit.verify_presentation(didAuth, '{}')
+        )
+        logging.info('check didAuth = %s',result)
     except (KeyError, AttributeError,ValueError)as error:
         logging.error(error)
         return jsonify(str(error.__class__)),403
+
+    if nonce != json.loads(didAuth)['proof']['challenge'] :
+        logging.info('nonce does not match')
+
     #if(not result["errors"]):
     username=username.replace(":","-")
     logging.info("u "+username+" p "+password)
@@ -84,6 +86,5 @@ if __name__ == '__main__':
 
     app.run( host = "localhost", port= mode.port, debug =True)
 init_app(app,red)
-
 
 
