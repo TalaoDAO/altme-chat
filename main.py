@@ -59,7 +59,8 @@ async def register(red):
         print(username)
         nonce=json.loads(red.get(username).decode())['nonce']
         print(nonce)
-        #didAuth =request.get_json()["didAuth"]
+        didAuth =request.get_json()["didAuth"]
+        print(didAuth)
         password=request.get_json()["password"]
         #result = json.loads(
             #await didkit.verify_presentation(didAuth, json.dumps({"challenge":nonce}))
@@ -68,6 +69,7 @@ async def register(red):
         logging.error(error)
         return jsonify(str(error.__class__)),403
     #if(not result["errors"]):
+    username=username.replace(":","-")
     logging.info("u "+username+" p "+password)
     logging.info("register_new_matrix_user -c /etc/matrix-synapse/homeserver.yaml -u "+username+" -p "+password+" --no-admin")
     stream = os.popen("""
