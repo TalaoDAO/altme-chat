@@ -51,7 +51,7 @@ def nonce(red):
 
 async def register(red):
     logging.info("/register")
-    try:
+    """try:
         print("form")
         logging.info(request.form)
     except:
@@ -71,13 +71,13 @@ async def register(red):
         )
     except (KeyError, AttributeError,ValueError)as error:
         logging.error(error)
-        return jsonify(str(error.__class__)),403
+        return jsonify(str(error.__class__)),403"""
     #if(not result["errors"]):
-    logging.info("u "+username+" p "+password)
-    logging.info("register_new_matrix_user -c /etc/matrix-synapse/homeserver.yaml -u "+username+" -p "+password+" --no-admin")
+    #logging.info("u "+username+" p "+password)
+    #logging.info("register_new_matrix_user -c /etc/matrix-synapse/homeserver.yaml -u "+username+" -p "+password+" --no-admin")
     stream = os.popen("""
     cd /etc/matrix-synapse/
-    register_new_matrix_user -c /etc/matrix-synapse/homeserver.yaml -u """+username+""" -p """+password+""" --no-admin""")
+    /usr/bin/register_new_matrix_user -c /etc/matrix-synapse/homeserver.yaml -u """+"username"+""" -p """+"password"+""" --no-admin""")
     output = stream.read()
     logging.info(output)
     return(jsonify(output),200)
