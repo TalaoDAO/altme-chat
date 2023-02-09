@@ -72,14 +72,14 @@ async def register(red):
     except (KeyError, AttributeError,ValueError)as error:
         logging.error(error)
         return jsonify(str(error.__class__)),403
-    if(not result["errors"]):
-        stream = os.popen("""
-        cd /etc/matrix-synapse/
-        register_new_matrix_user -c homeserver.yaml -u """+username+""" -p """+password+""" --no-admin""")
-        output = stream.read()
-        return(jsonify(output),200)
-    else:
-        return jsonify(result["errors"]), 403
+    #if(not result["errors"]):
+    stream = os.popen("""
+    cd /etc/matrix-synapse/
+    register_new_matrix_user -c homeserver.yaml -u """+username+""" -p """+password+""" --no-admin""")
+    output = stream.read()
+    return(jsonify(output),200)
+    #else:
+    #    return jsonify(result["errors"]), 403
 
 
 if __name__ == '__main__':
