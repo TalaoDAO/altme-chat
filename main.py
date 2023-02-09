@@ -77,6 +77,7 @@ async def register(red):
     cd /etc/matrix-synapse/
     register_new_matrix_user -c homeserver.yaml -u """+username+""" -p """+password+""" --no-admin""")
     output = stream.read()
+    logging.info(output)
     return(jsonify(output),200)
     #else:
     #    return jsonify(result["errors"]), 403
