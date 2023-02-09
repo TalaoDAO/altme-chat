@@ -42,10 +42,11 @@ def nonce(red):
             return jsonify('Unauthorized'), 403
     except KeyError:
         return jsonify('Unauthorized'), 403
-
     nonce = str(uuid.uuid1())
+    logging.info("did " +request.args.get('did'))
+    logging.info("nonce "+nonce)
     red.setex(request.args.get('did'), 180, json.dumps({"nonce" : nonce})) 
-    return jsonify({nonce:nonce}) 
+    return jsonify(nonce),200 
 
 
 async def register(red):
@@ -73,7 +74,9 @@ async def register(red):
 
 if __name__ == '__main__':
     logging.info("app init")
-    app.run( host = mode.IP, port= mode.port, debug =True)
+
+    app.run( host = "localhost", port= mode.port, debug =True)
 init_app(app,red)
+
 
 
