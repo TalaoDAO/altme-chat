@@ -52,10 +52,20 @@ def nonce(red):
 async def register(red):
     logging.info("/register")
     try:
-        username=request.form["username"]
+        print("form")
+        logging.info(request.form)
+    except:
+        pass
+    try:
+        print("json")
+        logging.info(request.get_json())
+    except:
+        pass
+    try:
+        username=request.get_json()["username"]
         nonce=json.loads(red.get(username).decode())['nonce']
-        didAuth =request.form["didAuth"]
-        password=request.form["password"]
+        didAuth =request.get_json()["didAuth"]
+        password=request.get_json()["password"]
         result = json.loads(
             await didkit.verify_presentation(didAuth, json.dumps({"challenge":nonce}))
         )
