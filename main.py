@@ -59,11 +59,11 @@ async def register(red):
         print(username)
         nonce=json.loads(red.get(username).decode())['nonce']
         print(nonce)
-        didAuth =request.get_json()["didAuth"]
+        #didAuth =request.get_json()["didAuth"]
         password=request.get_json()["password"]
-        result = json.loads(
-            await didkit.verify_presentation(didAuth, json.dumps({"challenge":nonce}))
-        )
+        #result = json.loads(
+            #await didkit.verify_presentation(didAuth, json.dumps({"challenge":nonce}))
+        #)
     except (KeyError, AttributeError,ValueError)as error:
         logging.error(error)
         return jsonify(str(error.__class__)),403
