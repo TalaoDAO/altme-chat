@@ -53,10 +53,12 @@ async def register(red):
     logging.info("/register")
 
     logging.info(request.get_json())
-    
+
     try:
         username=request.get_json()["username"]
+        print(username)
         nonce=json.loads(red.get(username).decode())['nonce']
+        print(nonce)
         didAuth =request.get_json()["didAuth"]
         password=request.get_json()["password"]
         result = json.loads(
