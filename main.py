@@ -7,6 +7,14 @@ import os
 import environment
 import didkit
 import logging
+import asyncio
+from nio import AsyncClient, MatrixRoom, RoomMessageText
+import requests
+
+
+client = AsyncClient("https://matrix.talao.co", "@support:matrix.talao.co")
+
+
 logging.basicConfig(level=logging.INFO)
 
 with open('keys.json') as mon_fichier:
@@ -15,12 +23,14 @@ with open('keys.json') as mon_fichier:
 app = Flask(__name__)
 app.secret_key = data.get('secret_key')
 API_KEY= data.get('API_KEY')
+PASSWORD_SUPPORT= data.get('PASSWORD_SUPPORT')
 
 characters = string.digits
 
 #init environnement variable
 myenv = os.getenv('MYENV')
-
+if not myenv:
+    myenv = "achille"
 mode = environment.currentMode(myenv)
 
 red= redis.Redis(host='127.0.0.1', port=6379, db=0)
@@ -29,6 +39,7 @@ red= redis.Redis(host='127.0.0.1', port=6379, db=0)
 def init_app(app,red) :
     app.add_url_rule('/matrix/nonce',  view_func=nonce, methods = ['GET'], defaults={'red' : red})
     app.add_url_rule('/matrix/register' , view_func=register,methods=['POST'], defaults={'red' : red})
+    app.add_url_rule('/send_message', view_func=send_message,methods=['POST'])
     return
 
 
@@ -81,10 +92,28 @@ async def register(red):
     #    return jsonify(result["errors"]), 403
 
 
+async def send_message():
+    logging.info("/send_message")
+    try:
+        if request.headers['X-API-KEY']!=API_KEY:
+            return jsonify('Unauthorized'), 403
+    except KeyError:
+        return jsonify('Unauthorized'), 403
+    did=request.get_json().get("did")
+    message=request.get_json().get("message")
+    response = requests.get('https://matrix.talao.co/_matrix/client/r0/directory/room/%23Altme-did-key-'+did+':matrix.talao.co')
+    room_id = response.json().get("room_id")
+    await client.login(PASSWORD_SUPPORT)
+    await client.room_send(
+        room_id=room_id,
+        message_type="m.room.message",
+        content={"msgtype": "m.text", "body": message},
+    )
+    await client.close()
+    return("ok",200)
+
 if __name__ == '__main__':
     logging.info("app init")
-
     app.run( host = "localhost", port= mode.port, debug =True)
+
 init_app(app,red)
-
-
