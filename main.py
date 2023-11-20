@@ -39,7 +39,7 @@ red= redis.Redis(host='127.0.0.1', port=6379, db=0)
 def init_app(app,red) :
     app.add_url_rule('/matrix/nonce',  view_func=nonce, methods = ['GET'], defaults={'red' : red})
     app.add_url_rule('/matrix/register' , view_func=register,methods=['POST'], defaults={'red' : red})
-    app.add_url_rule('/send_message', view_func=send_message,methods=['POST'])
+    app.add_url_rule('/matrix/send_message', view_func=send_message,methods=['POST'])
     return
 
 
