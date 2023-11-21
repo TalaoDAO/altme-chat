@@ -101,7 +101,7 @@ async def send_message():
         return jsonify('Unauthorized'), 403
     did=request.get_json().get("did")
     message=request.get_json().get("message")
-    response = requests.get('https://matrix.talao.co/_matrix/client/r0/directory/room/%23Altme-did-key-'+did+':matrix.talao.co')
+    response = requests.get('https://matrix.talao.co/_matrix/client/r0/directory/room/%23'+did+':matrix.talao.co')
     room_id = response.json().get("room_id")
     await client.login(PASSWORD_SUPPORT)
     await client.room_send(
