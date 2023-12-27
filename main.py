@@ -109,6 +109,7 @@ async def send_message():
     message = request.get_json().get("message")
     room = '#'+did+':matrix.talao.co'
     room = urllib.parse.quote(room, safe='')
+    logging.info("requesting "+'https://matrix.talao.co/_matrix/client/r0/directory/room/'+room)
     response = requests.get(
         'https://matrix.talao.co/_matrix/client/r0/directory/room/'+room)
     room_id = response.json().get("room_id")
