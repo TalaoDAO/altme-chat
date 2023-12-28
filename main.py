@@ -107,11 +107,13 @@ async def send_message():
     did = request.get_json().get("did")
     did = did.replace("/", "%2F")
     message = request.get_json().get("message")
-    room = '#'+did+':matrix.talao.co'
-    room = urllib.parse.quote(room, safe='')
-    logging.info("requesting "+'https://matrix.talao.co/_matrix/client/r0/directory/room/'+room)
-    response = requests.get(
-        'https://matrix.talao.co/_matrix/client/r0/directory/room/'+room)
+    did = "#gND0Nid9wcZ/l4/TRBrhrlhje/U8gkF59r4nGAqqd68"
+    logging.info(did)
+    did = urllib.parse.quote(did, safe='')
+    room = did + ':matrix.talao.co'    
+    logging.info(room)
+    logging.info("requesting "+'https://matrix.talao.co/_matrix/client/r0/directory/room/'+room)    
+    response = requests.get('https://matrix.talao.co/_matrix/client/r0/directory/room/'+room)
     room_id = response.json().get("room_id")
     await client.login(PASSWORD_SUPPORT)
     await client.room_send(
