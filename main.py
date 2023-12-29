@@ -104,10 +104,9 @@ async def send_message():
             return jsonify('Unauthorized'), 403
     except KeyError:
         return jsonify('Unauthorized'), 403
-    did = request.get_json().get("did")
-    did = did.replace("/", "%2F")
+    did = "#"+request.get_json().get("did")
+    
     message = request.get_json().get("message")
-    did = "#gND0Nid9wcZ/l4/TRBrhrlhje/U8gkF59r4nGAqqd68"
     logging.info(did)
     did = urllib.parse.quote(did, safe='')
     room = did + ':matrix.talao.co'    
